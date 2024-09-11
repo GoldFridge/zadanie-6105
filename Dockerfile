@@ -7,13 +7,15 @@ WORKDIR /app
 # Копируем все исходные файлы проекта в контейнер
 COPY . .
 
+# Устанавливаем модули (если используются go modules)
+RUN go mod tidy
+
 # Сборка бинарного файла
 RUN go build -o main ./backend/cmd/main.go
 
 # Минимальный образ для запуска приложения
 FROM alpine:latest
 
-EXPOSE 8080
 # Создаем директорию для приложения
 RUN mkdir /app
 
@@ -21,7 +23,7 @@ RUN mkdir /app
 COPY --from=build /app/main /app/main
 
 # Указываем порт, на котором будет работать приложение
-
+EXPOSE 8080
 
 # Указываем команду для запуска приложения
 ENTRYPOINT ["/app/main"]
