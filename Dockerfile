@@ -1,19 +1,32 @@
-FROM golang:latest as builder
+# Указываем базовый образ Go для сборки
+FROM golang:1.20 as builder
 
+# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Копируем go.mod и go.sum для того, чтобы можно было установить зависимости
+COPY backend/go.mod backend/go.sum ./backend/
+
+# Переходим в директорию backend
+WORKDIR /app/backend
+
+# Устанавливаем зависимости
 RUN go mod download
 
-COPY . .
+# Копируем все исходные файлы в контейнер
+COPY backend/ .
 
-RUN go build -o main .
+# Собираем бинарный файл
+RUN go build -o /app/main ./cmd/main.go
 
-FROM alpine:latest
+# Используем минимальный образ для запуска
+FROM gcr.io/distroless/base-debian10
 
-WORKDIR /root/
+# Указываем рабочую директорию
+WORKDIR /app
 
-COPY --from=builder /app/main
- .
+# Копируем бинарный файл из предыдущего шага
+COPY --from=builder /app/main .
 
-CMD ["./main"]
+# Указываем команду для запуска приложения
+CMD ["/app/main"]
