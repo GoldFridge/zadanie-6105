@@ -5,16 +5,15 @@ FROM golang:1.20-alpine AS build
 WORKDIR /app
 
 # Копируем go.mod и go.sum в рабочую директорию
-COPY go.mod go.sum ./
+COPY backend/go.mod backend/go.sum ./
 
 # Загружаем зависимости
 RUN go mod download
 
 # Копируем весь исходный код в рабочую директорию
-COPY . .
+COPY backend/ .
 
-# Переходим в папку backend и собираем бинарный файл
-WORKDIR /app/backend
+# Сборка бинарного файла
 RUN go build -o /app/main ./cmd/main.go
 
 # Минимальный образ для запуска приложения
