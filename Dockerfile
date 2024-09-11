@@ -1,32 +1,27 @@
-# Указываем базовый образ Go для сборки
-FROM golang:1.20 as builder
+# Используем образ для сборки приложения
+FROM golang:1.20-alpine AS build
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем go.mod и go.sum для того, чтобы можно было установить зависимости
-COPY backend/go.mod backend/go.sum ./backend/
+# Копируем все исходные файлы проекта в контейнер
+COPY . .
 
-# Переходим в директорию backend
-WORKDIR /app/backend
+# Сборка бинарного файла
+RUN go build -o main ./backend/cmd/main.go
 
-# Устанавливаем зависимости
-RUN go mod download
+# Минимальный образ для запуска приложения
+FROM alpine:latest
 
-# Копируем все исходные файлы в контейнер
-COPY backend/ .
+EXPOSE 8080
+# Создаем директорию для приложения
+RUN mkdir /app
 
-# Собираем бинарный файл
-RUN go build -o /app/main ./cmd/main.go
+# Копируем скомпилированное приложение из предыдущего шага
+COPY --from=build /app/main /app/main
 
-# Используем минимальный образ для запуска
-FROM gcr.io/distroless/base-debian10
+# Указываем порт, на котором будет работать приложение
 
-# Указываем рабочую директорию
-WORKDIR /app
-
-# Копируем бинарный файл из предыдущего шага
-COPY --from=builder /app/main .
 
 # Указываем команду для запуска приложения
-CMD ["/app/main"]
+ENTRYPOINT ["/app/main"]
