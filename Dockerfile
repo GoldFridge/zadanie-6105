@@ -4,14 +4,18 @@ FROM golang:1.20-alpine AS build
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем все исходные файлы проекта в контейнер
+# Копируем go.mod и go.sum в рабочую директорию
+COPY go.mod go.sum ./
+
+# Загружаем зависимости
+RUN go mod download
+
+# Копируем весь исходный код в рабочую директорию
 COPY . .
 
-# Устанавливаем модули (если используются go modules)
-RUN go mod tidy
-
-# Сборка бинарного файла
-RUN go build -o main ./backend/cmd/main.go
+# Переходим в папку backend и собираем бинарный файл
+WORKDIR /app/backend
+RUN go build -o /app/main ./cmd/main.go
 
 # Минимальный образ для запуска приложения
 FROM alpine:latest
