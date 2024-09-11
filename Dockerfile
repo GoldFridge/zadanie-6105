@@ -5,7 +5,7 @@ FROM golang:1.20-alpine AS build
 WORKDIR /app
 
 # Копируем go.mod и go.sum в рабочую директорию
-COPY go.mod go.sum ./
+COPY backend/go.mod backend/go.sum ./
 
 # Загружаем зависимости
 RUN go mod download
