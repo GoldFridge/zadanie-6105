@@ -1,19 +1,32 @@
-FROM golang:latest as builder
+# Этап сборки (Build Stage)
+FROM golang:1.22-alpine AS build
 
+# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Копируем go.mod и go.sum в рабочую директорию
+COPY backend/go.mod backend/go.sum ./
+
+# Загружаем зависимости
 RUN go mod download
 
-COPY . .
+# Копируем весь исходный код в рабочую директорию
+COPY backend/ .
 
-RUN go build -o main .
+# Сборка бинарного файла
+RUN go build -o main ./cmd/main.go
 
+# Этап выполнения (Runtime Stage)
 FROM alpine:latest
 
-WORKDIR /root/
+# Открываем порт 8080
+EXPOSE 8080
 
-COPY --from=builder /app/main
- .
+# Создаем директорию для приложения
+RUN mkdir /app
 
-CMD ["./main"]
+# Копируем собранное приложение из предыдущего этапа
+COPY --from=build /app/main /app/main
+
+# Указываем команду для запуска приложения
+ENTRYPOINT ["/app/main"]
