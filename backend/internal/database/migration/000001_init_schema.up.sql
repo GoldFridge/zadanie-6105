@@ -31,27 +31,6 @@ CREATE TABLE organization_responsible (
                                           user_id UUID REFERENCES employee(id) ON DELETE CASCADE
 );
 
--- Создание таблицы тендера
-CREATE TABLE tender (
-                        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                        organization_id UUID REFERENCES organization(id) ON DELETE CASCADE,
-                        created_by UUID REFERENCES employee(id) ON DELETE CASCADE,
-                        status VARCHAR(20) NOT NULL DEFAULT 'CREATED',
-                        version INT DEFAULT 1,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Создание таблицы предложения
-CREATE TABLE proposal (
-                          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                          tender_id UUID REFERENCES tender(id) ON DELETE CASCADE,
-                          created_by UUID REFERENCES employee(id) ON DELETE CASCADE,
-                          status VARCHAR(20) NOT NULL DEFAULT 'CREATED',
-                          version INT DEFAULT 1,
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 -- Вставка тестовых данных в таблицу пользователей
 INSERT INTO employee (id, username, first_name, last_name) VALUES
@@ -73,7 +52,3 @@ INSERT INTO tender (id, organization_id, created_by, status, version) VALUES
                                                                           (uuid_generate_v4(), (SELECT id FROM organization WHERE name = 'Org1'), (SELECT id FROM employee WHERE username = 'user1'), 'CREATED', 1),
                                                                           (uuid_generate_v4(), (SELECT id FROM organization WHERE name = 'Org2'), (SELECT id FROM employee WHERE username = 'user2'), 'PUBLISHED', 1);
 
--- Вставка тестовых данных в таблицу предложений
-INSERT INTO proposal (id, tender_id, created_by, status, version) VALUES
-                                                                      (uuid_generate_v4(), (SELECT id FROM tender WHERE status = 'CREATED'), (SELECT id FROM employee WHERE username = 'user1'), 'CREATED', 1),
-                                                                      (uuid_generate_v4(), (SELECT id FROM tender WHERE status = 'PUBLISHED'), (SELECT id FROM employee WHERE username = 'user2'), 'PUBLISHED', 1);
