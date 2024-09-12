@@ -13,6 +13,9 @@ RUN go mod download
 # Копируем весь исходный код в рабочую директорию
 COPY backend/ .
 
+# Копируем Swagger-документацию
+COPY backend/docs /app/docs
+
 # Сборка бинарного файла
 RUN go build -o main ./cmd/main.go
 
@@ -25,8 +28,9 @@ EXPOSE 8080
 # Создаем директорию для приложения
 RUN mkdir /app
 
-# Копируем собранное приложение из предыдущего этапа
+# Копируем собранное приложение и Swagger-документацию из предыдущего этапа
 COPY --from=build /app/main /app/main
+COPY --from=build /app/docs /app/docs
 
 # Указываем команду для запуска приложения
 ENTRYPOINT ["/app/main"]
