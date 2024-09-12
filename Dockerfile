@@ -32,5 +32,8 @@ RUN mkdir /app
 COPY --from=build /app/main /app/main
 COPY --from=build /app/docs /app/docs
 
+# Копируем .env файл
+COPY backend/.env /app/.env
+
 # Указываем команду для запуска приложения
 ENTRYPOINT ["/app/main"]
