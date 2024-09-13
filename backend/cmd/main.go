@@ -16,7 +16,7 @@ import (
 // @version 1.0
 // @description API Server for TodoList Application
 
-// @host localhost:8080
+// @host cnrprod1725725290-team-77871-32639.avito2024.codenrock.com
 // @BasePath /
 
 func main() {

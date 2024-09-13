@@ -60,7 +60,7 @@ definitions:
       version:
         type: integer
     type: object
-host: localhost:8080
+host: cnrprod1725725290-team-77871-32639.avito2024.codenrock.com
 info:
   contact: {}
   description: API Server for TodoList Application

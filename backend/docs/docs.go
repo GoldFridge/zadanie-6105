@@ -330,7 +330,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "cnrprod1725725290-team-77871-32639.avito2024.codenrock.com",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "TenderAPI",
