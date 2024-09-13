@@ -24,7 +24,8 @@ func main() {
 	http.HandleFunc("/api/ping", handlers.PingHandler)
 	http.HandleFunc("/api/tenders", TenderHandlers.GetTender)
 	http.HandleFunc("/api/tenders/new", TenderHandlers.CreateTender)
-
+	http.HandleFunc("/api/tenders/{tenderId}/edit", TenderHandlers.UpdateTender)
+	http.HandleFunc("/api/tenders/{tenderId}/rollback/{version}", TenderHandlers.RollbackTender)
 	http.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	fmt.Println("Сервер запущен на http://localhost:8080/api")

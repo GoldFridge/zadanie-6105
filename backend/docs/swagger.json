@@ -96,9 +96,151 @@
                     }
                 }
             }
+        },
+        "/api/tenders/{tenderId}/edit": {
+            "patch": {
+                "description": "Обновляет параметры существующего тендера и возвращает обновленный тендер",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tenders"
+                ],
+                "summary": "Обновление существующего тендера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID тендера",
+                        "name": "tenderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Тело запроса для обновления тендера",
+                        "name": "tender",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TenderHandlers.UpdateTenderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное обновление тендера",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tender"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Тендер не найден",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/tenders/{tenderId}/rollback/{version}": {
+            "put": {
+                "description": "Откатывает параметры тендера к указанной версии",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tenders"
+                ],
+                "summary": "Откат тендера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID тендера",
+                        "name": "tenderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Версия тендера",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный откат тендера",
+                        "schema": {
+                            "$ref": "#/definitions/models.Tender"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Тендер или версия не найдены",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "TenderHandlers.UpdateTenderRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Tender": {
             "description": "Tender содержит информацию о тендере",
             "type": "object",
@@ -128,6 +270,9 @@
                 "status": {
                     "$ref": "#/definitions/models.TenderStatus"
                 },
+                "tender_version": {
+                    "$ref": "#/definitions/models.TenderVersion"
+                },
                 "updated_at": {
                     "type": "string"
                 },
@@ -149,6 +294,29 @@
                 "TenderPublished",
                 "TenderClosed"
             ]
+        },
+        "models.TenderVersion": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tender_id": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }
