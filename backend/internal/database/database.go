@@ -14,7 +14,7 @@ import (
 var DB *gorm.DB
 
 func InitDatabase() {
-	err := godotenv.Load("app/.env")
+	err := godotenv.Load("backend/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
 	}
@@ -25,7 +25,7 @@ func InitDatabase() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	err = DB.AutoMigrate(&models.Tender{}, &models.Bid{}, &models.TenderVersion{})
+	err = DB.AutoMigrate(&models.Tender{}, &models.Bid{}, &models.TenderVersion{}, &models.BidVersion{})
 	if err != nil {
 		log.Println("Failed to migrate database:", err)
 	}

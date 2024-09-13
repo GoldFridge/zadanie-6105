@@ -1,5 +1,27 @@
 basePath: /
 definitions:
+  BidHandlers.CreateBidRequest:
+    properties:
+      creatorUsername:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      organizationId:
+        type: string
+      status:
+        type: string
+      tenderId:
+        type: string
+    type: object
+  BidHandlers.UpdateBidRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
   TenderHandlers.UpdateTenderRequest:
     properties:
       description:
@@ -7,6 +29,39 @@ definitions:
       name:
         type: string
     type: object
+  models.Bid:
+    description: Предложение для тендера
+    properties:
+      created_at:
+        type: string
+      created_by:
+        description: ID пользователя
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/models.BidStatus'
+      tender_id:
+        type: string
+      updated_at:
+        type: string
+      version:
+        type: integer
+    type: object
+  models.BidStatus:
+    enum:
+    - CREATED
+    - PUBLISHED
+    - CANCELED
+    type: string
+    x-enum-varnames:
+    - BidCreated
+    - BidPublished
+    - BidCanceled
   models.Tender:
     description: Tender содержит информацию о тендере
     properties:
@@ -67,6 +122,206 @@ info:
   title: TenderAPI
   version: "1.0"
 paths:
+  /api/bids/{bidId}/edit:
+    patch:
+      consumes:
+      - application/json
+      description: Обновляет параметры предложения и возвращает обновленные данные
+        предложения.
+      parameters:
+      - description: ID предложения
+        format: uuid
+        in: path
+        name: bidId
+        required: true
+        type: string
+      - description: Тело запроса для обновления предложения
+        in: body
+        name: bid
+        required: true
+        schema:
+          $ref: '#/definitions/BidHandlers.UpdateBidRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное обновление предложения
+          schema:
+            $ref: '#/definitions/models.Bid'
+        "400":
+          description: Неверный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Предложение не найдено
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновление существующего предложения
+      tags:
+      - Bids
+  /api/bids/{bidId}/rollback/{version}:
+    put:
+      consumes:
+      - application/json
+      description: Откатывает предложение к указанной версии и возвращает обновленные
+        данные предложения.
+      parameters:
+      - description: ID предложения
+        format: uuid
+        in: path
+        name: bidId
+        required: true
+        type: string
+      - description: Версия предложения
+        in: path
+        name: version
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленные данные предложения
+          schema:
+            $ref: '#/definitions/models.Bid'
+        "400":
+          description: Неверный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Предложение или версия не найдены
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Откат предложения к указанной версии
+      tags:
+      - Bids
+  /api/bids/{tenderId}/list:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список предложений, связанных с указанным тендером.
+      parameters:
+      - description: ID тендера
+        format: uuid
+        in: path
+        name: tenderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список предложений для тендера
+          schema:
+            items:
+              $ref: '#/definitions/models.Bid'
+            type: array
+        "400":
+          description: Неверный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение списка предложений для указанного тендера
+      tags:
+      - Bids
+  /api/bids/my:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список предложений текущего пользователя по его имени
+        пользователя.
+      parameters:
+      - description: Имя пользователя
+        format: string
+        in: query
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список предложений пользователя
+          schema:
+            items:
+              $ref: '#/definitions/models.Bid'
+            type: array
+        "400":
+          description: Неверный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получение списка предложений текущего пользователя
+      tags:
+      - Bids
+  /api/bids/new:
+    post:
+      consumes:
+      - application/json
+      description: Создает новое предложение для существующего тендера
+      parameters:
+      - description: Данные для создания нового предложения
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/BidHandlers.CreateBidRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное создание предложения
+          schema:
+            $ref: '#/definitions/models.Bid'
+        "400":
+          description: Неверный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создание нового предложения
+      tags:
+      - Bids
   /api/ping:
     get:
       consumes:

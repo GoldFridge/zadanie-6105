@@ -4,6 +4,7 @@ import (
 	_ "backend/docs"
 	"backend/internal/database"
 	"backend/internal/handlers"
+	"backend/internal/handlers/BidHandlers"
 	"backend/internal/handlers/TenderHandlers"
 	_ "backend/internal/models"
 	"fmt"
@@ -26,6 +27,11 @@ func main() {
 	http.HandleFunc("/api/tenders/new", TenderHandlers.CreateTender)
 	http.HandleFunc("/api/tenders/{tenderId}/edit", TenderHandlers.UpdateTender)
 	http.HandleFunc("/api/tenders/{tenderId}/rollback/{version}", TenderHandlers.RollbackTender)
+	http.HandleFunc("/api/bids/new", BidHandlers.CreateBid)
+	http.HandleFunc("/api/bids/my", BidHandlers.GetMyBids)
+	http.HandleFunc("/api/bids/{tenderId}/list", BidHandlers.GetMyBids)
+	http.HandleFunc("/api/bids/{bidId}/edit", BidHandlers.UpdateBid)
+	http.HandleFunc("/api/bids/{bidId}/rollback/{version}", BidHandlers.RollbackBid)
 	http.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	fmt.Println("Сервер запущен на http://localhost:8080/api")
